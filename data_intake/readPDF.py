@@ -11,7 +11,9 @@ def extract_text_from_pdf(input_pdf):
         for page in reader.pages:
             full_text += page.extract_text() or ""
 
-    return full_text
+        metadata = extract_metadata(reader)
+
+    return full_text, metadata
 
 def clean_pdf_text(text):
     text = re.sub(r' +', ' ', text)
@@ -20,17 +22,39 @@ def clean_pdf_text(text):
 
     return cleaned_text
 
-def main():
+def extract_metadata(reader):
+    metadata = reader.metadata
+            
+    return {
+        'title': metadata.get('/Title', 'Unknown'),
+        'author': metadata.get('/Author', 'Unknown'),
+        'subject': metadata.get('/Subject', 'Unknown'),
+        'creator': metadata.get('/Creator', 'Unknown'),
+        'producer': metadata.get('/Producer', 'Unknown'),
+        'creation_date': metadata.get('/CreationDate', 'Unknown'),
+        'num_pages': len(reader.pages)
+    }
+
+def process_document_bucket(): # MAIN FUNCTION
     document_bucket_dir = Path("document_bucket")
+    metadata_file = "metadata.txt"
 
     for file in document_bucket_dir.iterdir():
         if file.is_file():
-            extracted_text = extract_text_from_pdf(file)
+            extracted_text, metadata = extract_text_from_pdf(file)
             cleaned_text = clean_pdf_text(extracted_text)
+
+            with open(metadata_file, 'a', encoding='utf-8') as meta_out:
+                    meta_out.write(f"\n{'='*80}\n")
+                    meta_out.write(f"FILE: {file.name}\n")
+                    meta_out.write(f"{'-'*80}\n")
+                    for key, value in metadata.items():
+                        meta_out.write(f"{key}: {value}\n")
 
             with open('extracted_text.txt', 'a', encoding='utf-8') as output_file:
                 output_file.write("\n\n----------------NEW DOCUMENT STARTS HERE: " + file.name + "-----------------------\n\n")
                 output_file.write(cleaned_text)
 
+
 if __name__ == "__main__":
-    main()
+    process_document_bucket()
