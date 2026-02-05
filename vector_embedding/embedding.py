@@ -1,6 +1,10 @@
 from pathlib import Path
+import faiss
+import numpy as np
+import pickle
 from sentence_transformers import SentenceTransformer
 
+MODEL = "all-MiniLM-L6-v2"
 chunks = []
 
 def load_chunks(chunk_directory):
@@ -10,8 +14,10 @@ def load_chunks(chunk_directory):
                 content = current_file.read()
                 chunks.append(content)
 
+    return chunks
+
 def chunk_embeddings(chunks):
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer(MODEL)
     embeddings = model.encode(chunks)
 
     print(f"Embedding shape: {embeddings.shape}")
@@ -20,11 +26,38 @@ def chunk_embeddings(chunks):
 
     return embeddings
 
-def save_embeddings(embeddings):
-    # TO DO - fill in next
-    return
+def save_embeddings(embeddings, chunks):
+    dimension = embeddings.shape[1]
+
+    index = faiss.IndexFlatL2(dimension)
+    index.add(embeddings)
+
+    faiss.write_index(index, "embeddings.index")
+
+    with open("chunks.pk1", "wb") as f:
+        pickle.dump(chunks, f)
+
+    print(f"Saved {len(chunks)} embeddings")
+
+def embed_and_save():
+    directory = Path("chunks")
+    chunks = load_chunks(directory)
+    embeddings = chunk_embeddings(chunks)
+    save_embeddings(embeddings, chunks)
+
+def search(query, top_k):
+    model = SentenceTransformer(MODEL)
+
+    query_embedding = model.encode([query])
+    index = faiss.read_index("embeddings.index")
+
+    with open("chunks.pk1", "rb") as f:
+        chunks = pickle.load(f)
+    
+    distances, indicies = index.search(query_embedding, top_k)
+
+    for i in indicies[0]:
+        print(chunks[i])
 
 if __name__ == "__main__":
-    directory = Path("chunks")
-    load_chunks(directory)
-    embeddings = chunk_embeddings(chunks)
+    search("Uw-Whitewater", 1)
