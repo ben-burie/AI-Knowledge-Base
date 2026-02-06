@@ -10,8 +10,10 @@ client = genai.Client(api_key=os.getenv('API-KEY'))
 
 def query_llm(user_prompt):
 
-    relevant_chunks = search(user_prompt, 1)
+    relevant_chunks = search(user_prompt, 3) # (user_prompt, top_k chunks)
     context = "\n\n".join(relevant_chunks)
+    #print("RELEVANT CHUNKS: ", relevant_chunks)
+    print("CONTEXT: ", context)
 
     try:
         response = client.models.generate_content(
@@ -19,8 +21,8 @@ def query_llm(user_prompt):
             config=types.GenerateContentConfig(
                 system_instruction=(
                     "You are a helpful assistant."
-                    "Answer the question using ONLY the provided context."
-                    "If the answer is not in the context, say you do not know."
+                    "Answer the question using the provided context."
+                    "The answer may not explicitly be in the context, MAKE SURE to use the context to infer the answer."
                 )
             ),
             contents=[

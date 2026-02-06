@@ -60,9 +60,4 @@ def search(query, top_k):
     
     distances, indicies = index.search(query_embedding, top_k)
 
-    for i in indicies[0]:
-        return chunks[i]
-
-if __name__ == "__main__":
-    chunks = search("Uw-Whitewater", 1)
-    print(chunks)
+    return [chunks[i] for i in indicies[0]]

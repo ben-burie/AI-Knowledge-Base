@@ -1,6 +1,8 @@
 from pypdf import PdfReader
 from pathlib import Path
 import re
+import os
+import shutil
 
 def extract_text_from_pdf(input_pdf):
     with open(input_pdf, 'rb') as file:
@@ -41,6 +43,11 @@ def process_document_bucket():
     output_path = "raw_text/extracted_text.txt"
     processed_count = 0
 
+    # Clear directories
+    clear_directory("raw_text")
+    clear_directory("chunks")
+    clear_directory("vector_db")
+
     for file in document_bucket_dir.iterdir():
         if file.is_file():
             extracted_text, metadata = extract_text_from_pdf(file)
@@ -59,3 +66,18 @@ def process_document_bucket():
 
             processed_count += 1
             print("Files Processed: ", processed_count)
+
+def clear_directory(directory_path):
+    if not os.path.exists(directory_path):
+        print(f"Directory not found: {directory_path}")
+        return
+
+    for item in os.listdir(directory_path):
+        item_path = os.path.join(directory_path, item)
+        try:
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+        except OSError as e:
+            print(f"Error removing {item_path}: {e}")
