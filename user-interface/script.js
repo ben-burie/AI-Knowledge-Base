@@ -19,14 +19,12 @@ function handleSubmit() {
         return;
     }
 
-    // Show loading state
     submitBtn.disabled = true;
     submitBtn.textContent = 'Processing...';
     responseSection.classList.add('visible');
     responseContent.innerHTML = '<div class="loading">Analyzing your question</div>';
     ticketList.innerHTML = '';
 
-    // Make API call to Flask backend
     fetch('/api/question', {
         method: 'POST',
         headers: {
@@ -43,10 +41,9 @@ function handleSubmit() {
         return response.json();
     })
     .then(data => {
-        // Display the response
         const responseData = {
             answer: data.answer,
-            tickets: data.tickets || [] // If your backend returns tickets, otherwise empty array
+            tickets: data.tickets || []
         };
         displayResponse(responseData);
         submitBtn.disabled = false;
@@ -63,53 +60,18 @@ function handleSubmit() {
 function displayResponse(data) {
     let answer = data.answer;
     let tickets = data.tickets || [];
-    
-    // Extract ticket numbers from the answer text
-    const ticketPattern = /(Relevant ticket numbers:)\s*\n?\s*(?:\d+\.\s*)?(IT-\d+(?:\s*,?\s*\n?\s*(?:\d+\.\s*)?IT-\d+)*)/gi;
-    const ticketMatches = answer.match(ticketPattern);
-    console.log("TICKET MATCHES: ", ticketMatches);
-    
-    if (ticketMatches) {
-        // Extract individual ticket IDs
-        const ticketIds = [];
-        ticketMatches.forEach(match => {
-            const ids = match.match(/IT-\d+/g);
-            if (ids) {
-                ticketIds.push(...ids);
-            }
-        });
-        
-        // Remove the ticket section from the answer
-        answer = answer.replace(/(Relevant ticket numbers:)\s*\n?\s*(?:\d+\.\s*)?(IT-\d+(?:\s*,?\s*\n?\s*(?:\d+\.\s*)?IT-\d+)*)/gi, '').trim();
-        
-        // Create ticket objects from the extracted IDs
-        ticketIds.forEach(id => {
-            tickets.push({
-                id: id,
-                title: "Related incident",
-                url: `#ticket-${id}`,
-                date: new Date().toISOString().split('T')[0]
-            });
-        });
-    }
 
-    console.log("Tickets after extraction: ", tickets);
-    
-    // Convert **text** to <strong>text</strong> for bold formatting
     answer = answer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Convert newlines to <br> tags for proper line breaks
+
     answer = answer.replace(/\n/g, '<br>');
-    
-    // Display answer with HTML rendering
+
     responseContent.innerHTML = answer;
 
-    // Display related tickets
     if (tickets && tickets.length > 0) {
         ticketList.innerHTML = tickets.map(ticket => `
             <li class="ticket-item">
-                <a href="${ticket.url}" class="ticket-link">${ticket.id}: ${ticket.title}</a>
-                <div class="ticket-meta">${ticket.date}</div>
+                <a class="ticket-link">${ticket.ticket_id}: ${ticket.issue}</a>
+                <div class="ticket-meta">${ticket.resolution}</div>
             </li>
         `).join('');
     } else {

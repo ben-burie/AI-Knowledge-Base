@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from llm import query_llm
+from main import extract_ticket_ids, find_ticket_by_id
 
 app = Flask(__name__)
 CORS(app)
@@ -26,7 +27,18 @@ def ask_question():
     response = query_llm(user_prompt)
     print(f"LLM response: {response}")
 
-    return jsonify({'answer': response})
+    cleaned_response, ticket_ids = extract_ticket_ids(response)
+
+    tickets = []
+    for ticket_id in ticket_ids:
+        ticket = find_ticket_by_id(ticket_id)
+        if ticket:
+            tickets.append(ticket)
+
+    return jsonify({
+        'answer': cleaned_response,
+        'tickets': tickets
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

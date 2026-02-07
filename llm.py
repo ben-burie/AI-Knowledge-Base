@@ -13,12 +13,8 @@ def query_llm(user_prompt):
     relevant_chunks = search(user_prompt, 3) # (user_prompt, top_k chunks)
     context = "\n\n".join(relevant_chunks)
     #print("RELEVANT CHUNKS: ", relevant_chunks)
-    print("CONTEXT: ", context)
-    return """To reset a user's MFA token, you should reset their MFA methods in the Azure AD portal. After resetting, the user will need to re-register their Microsoft Authenticator or other MFA methods.
+    #print("CONTEXT: ", context)
 
-            Relevant ticket numbers:
-            1. IT-50006
-            2. IT-50167"""
     try:
         response = client.models.generate_content(
             model="models/gemini-2.5-flash",
