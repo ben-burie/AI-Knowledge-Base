@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriageAI - IT Support Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>TriageAI</h1>
+            <p class="description">A retrieval-augmented knowledge assistant for IT support teams, enabling fast access to historical incidents and troubleshooting documentation.</p>
+        </header>
+
+        <div class="query-section">
+            <label for="question">Your Question</label>
+            <textarea 
+                id="question" 
+                placeholder="e.g., How do I reset a user's MFA token in Azure AD?"
+                rows="4"
+            ></textarea>
+            <button class="submit-btn" id="submitBtn">Submit Query</button>
+        </div>
+
+        <div class="response-section" id="responseSection">
+            <div class="response-box">
+                <h2>Response</h2>
+                <div class="response-content" id="responseContent">
+                    <!-- Response will be inserted here -->
+                </div>
+            </div>
+
+            <div class="related-tickets">
+                <h2>Related Tickets</h2>
+                <ul class="ticket-list" id="ticketList">
+                    <!-- Tickets will be inserted here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -49,7 +49,7 @@ def process_document_bucket():
     clear_directory("vector_db")
 
     for file in document_bucket_dir.iterdir():
-        if file.is_file():
+        if file.is_file() and file.suffix.lower() == '.pdf':
             extracted_text, metadata = extract_text_from_pdf(file)
             cleaned_text = clean_pdf_text(extracted_text)
 

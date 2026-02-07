@@ -14,15 +14,20 @@ def query_llm(user_prompt):
     context = "\n\n".join(relevant_chunks)
     #print("RELEVANT CHUNKS: ", relevant_chunks)
     print("CONTEXT: ", context)
+    return """To reset a user's MFA token, you should reset their MFA methods in the Azure AD portal. After resetting, the user will need to re-register their Microsoft Authenticator or other MFA methods.
 
+            Relevant ticket numbers:
+            1. IT-50006
+            2. IT-50167"""
     try:
         response = client.models.generate_content(
             model="models/gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 system_instruction=(
-                    "You are a helpful assistant."
+                    "You are a helpful assistant to IT helpdesk workers."
                     "Answer the question using the provided context."
                     "The answer may not explicitly be in the context, MAKE SURE to use the context to infer the answer."
+                    "Please give 3 of the most relevant ticket numbers of the relevant tickets used in the answer. Format them like this: 'Relevant ticket numbers:\n 1. IT-12345, 2. IT-67890, 3. IT-24680' If there are no relevant tickets, say 'There are no relevant tickets.'"
                 )
             ),
             contents=[

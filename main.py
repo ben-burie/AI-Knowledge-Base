@@ -5,7 +5,7 @@ from llm import query_llm
 
 INPUT_FILE = "raw_text/extracted_text.txt"
 OUTPUT_DIR = "chunks"
-MAX_SIZE = 4000
+MAX_SIZE = 2000
 
 def ask_question():
     user_prompt = input("\n\nAsk a question: ")
@@ -33,5 +33,6 @@ if __name__ == "__main__":
             ask_question()
             print("\n")
         elif choice == 3:
-            print("Invalid choice.\n")
             break
+        else:
+            print("Invalid choice.\n")
